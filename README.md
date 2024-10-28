@@ -1,4 +1,4 @@
-# Custom WSL2 Linux Kernel
+# Windows WSL2 Kernel Build Script
 
 This repository is forked from the excellent [Windows WSL2 Kernel Build Script
 repo by
