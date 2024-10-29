@@ -8,9 +8,9 @@ on:
       - hotfix/*
     tags:
       - linux-msft-wsl-*
+  workflow_dispatch: {}
   pull_request: {}
   workflow_call: {}
-
 jobs:
   build:
     name: Build
