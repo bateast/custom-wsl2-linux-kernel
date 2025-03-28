@@ -1,0 +1,35 @@
+#!/bin/bash
+# shellcheck disable=SC2016,SC2046,SC2066,SC2068,SC2086,SC2162,SC2317
+
+clear
+
+##
+## set the available cpu thread and core count for parallel processing (speeds up the build process)
+##
+
+if [ -f '/proc/cpuinfo' ]; then
+    cpu_threads="$(grep -c ^processor '/proc/cpuinfo')"
+else
+    cpu_threads="$(nproc --all)"
+fi
+cpu_cores="$(grep ^cpu\\scores '/proc/cpuinfo' | uniq | awk '{print $4}')"
+
+build_mod(){
+    # build the modules VHDX (https://github.com/microsoft/WSL2-Linux-Kernel)
+
+    # Calculate the modules size (plus 1024 bytes for slack): 
+    modules_size=$(du -s "$PWD/modules" | awk '{print $1;}');  modules_size=$(($modules_size * 2));
+    modules_blk=$(( ${modules_size} / 512 + 1 + 4096 ))
+    # Create a blank image file for the modules: 
+    dd if=/dev/zero of="$PWD/modules.img" bs=512 count=$modules_blk 
+    # Setup filesystem and mount img file: 
+    mkdir "$PWD/modules_img"
+    lo_dev=$(sudo losetup --find --show "$PWD/modules.img") && sudo mkfs -t ext4 "$lo_dev" && sudo mount "$lo_dev" "$PWD/modules_img"
+
+    # Copy over the modules, unmount the img now that we're done with it: 
+    sudo cp -r "$PWD/modules" "$PWD/modules_img" && sudo umount "$PWD/modules_img"
+}
+
+cd  "linux-msft-wsl"
+make KCONFIG_CONFIG=../config-wsl INSTALL_MOD_PATH="$PWD/modules" modules_install  -j "$cpu_cores"
+build_mod
