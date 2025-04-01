@@ -31,11 +31,16 @@ jobs:
       - name: Build Modules
         run: |
           sudo bash build-modules
-          cp linux-msft-wsl/modules.img .
+          cp linux-msft-wsl/modules.xz .
+      - name: Upload Modules
+        uses: actions/upload-artifact@v4
+        with:
+          name: modules.xz
+          path: modules.xz
       - name: Release
         uses: softprops/action-gh-release@v1
         if: startsWith(github.ref, 'refs/tags/')
         with:
           files: |
             vmlinux
-            modules.img
+            modules.xz
