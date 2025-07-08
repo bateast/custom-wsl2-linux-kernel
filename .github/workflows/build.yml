@@ -20,16 +20,34 @@ jobs:
         uses: actions/checkout@v4
       - name: Build Kernel
         run: |
+          pwd
           sudo apt-get update -yqq
           sudo bash build-kernel
-          cp linux-msft-wsl-*/vmlinux .
+          ls -ltrah
+          cp  /home/runner/work/custom-wsl2-linux-kernel/custom-wsl2-linux-kernel/linux-msft-wsl*/vmlinux .
       - name: Upload Kernel
         uses: actions/upload-artifact@v4
         with:
           name: vmlinux
           path: vmlinux
-      - name: Release
+      - name: Release Vmlinux
         uses: softprops/action-gh-release@v1
         if: startsWith(github.ref, 'refs/tags/')
         with:
           files: vmlinux
+      - name: Build Modules
+        run: |
+          pwd
+          sudo bash build-modules
+          ls -ltrah
+          cp  /home/runner/work/custom-wsl2-linux-kernel/custom-wsl2-linux-kernel/linux-msft-wsl*/modules.tar.xz .
+      - name: Upload Modules
+        uses: actions/upload-artifact@v4
+        with:
+          name: modules.tar.xz
+          path: modules.tar.xz
+      - name: Release Modules
+        uses: softprops/action-gh-release@v1
+        if: startsWith(github.ref, 'refs/tags/')
+        with:
+          files: modules.tar.xz
