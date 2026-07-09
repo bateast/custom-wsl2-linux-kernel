@@ -1,6 +1,6 @@
 #!/bin/bash
 
-TAG=linux-msft-wsl-6.6.87.2
+TAG=linux-msft-wsl-6.18.35.2
 
 clear
 
